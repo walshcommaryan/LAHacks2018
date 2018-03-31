@@ -1,62 +1,7 @@
 package com.example.ryan.laparking;
 
-import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-public class GeojsonData
-{
-    // Constant URL address for obtaining parking lot data
-    private static final String LOTS_GJSON =
-            "http://geohub.lacity.org/datasets/be7c8c4ab95b4d82af18255ad1a3212c_2.geojson";
-
-    // Obtains the geojson file from LOTS_GJSON url
-    // and returns it as a String.
-    private static String readMapServer() throws Exception {
-        BufferedReader reader = null;
-        try {
-            URL url = new URL(LOTS_GJSON);
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            StringBuffer buffer = new StringBuffer();
-            int read;
-            char[] chars = new char[1024];
-            while ((read = reader.read(chars)) != -1)
-                buffer.append(chars, 0, read);
-            return buffer.toString();
-        } finally {
-            if (reader != null)
-                reader.close();
-        }
-    }
-
-    // main() function primarily used for debuggind and testing.
-    // Can delete or comment out at the final build when the
-    // GUI is implemented.
-    public static void main(String[] args)
-    {
-        try
-        {
-            System.out.println("TESTING...");
-            String geojson = readMapServer();
-            System.out.println(geojson);
-            LotsData ld = new Gson().fromJson(geojson, LotsData.class);
-            System.out.println(ld.type);
-            System.out.println(ld.features[0].properties.Address);
-            System.out.println(ld.features[0].geometry.coordinates[0]);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        System.out.println("END OF TESTING");
-    }
-}
-
-
-class LotsData
+public class LotsData
 {
     String type;    // Data stored type (i.e. "FeatureCollection")
     ParkingLot[] features;  // An Array of all parking lots in LA

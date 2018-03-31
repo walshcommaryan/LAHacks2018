@@ -11,14 +11,16 @@ import android.widget.Button;
 import com.example.ryan.laparking.R;
 
 public class CustomAdapter extends ArrayAdapter{
-    Model[]modelItems=null;
+    ParkingLot[]modelItems=null;
     Context context;
-    public CustomAdapter(Context context, Model[]resources)
+
+    public CustomAdapter(Context context, ParkingLot[]resources)
     {
         super(context, R.layout.rows, resources);
         this.context=context;
         this.modelItems=resources;
     }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent){
         // TODO Auto-generated method stub
@@ -29,8 +31,6 @@ public class CustomAdapter extends ArrayAdapter{
         return convertView;
 
     }
-
-
 }
 
 

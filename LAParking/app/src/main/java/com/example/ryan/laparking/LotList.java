@@ -6,13 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
 public class LotList extends Activity{
-    Model modelItems[];
     ListView lv;
 
     @Override
@@ -20,20 +21,11 @@ public class LotList extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_lot_list);
         lv = (ListView) findViewById(R.id.listView1);
-
         Intent i = getIntent();
-
-        System.out.println("TESTING");
-
-        modelItems = new Model[100];
-
-        CustomAdapter adapter = new CustomAdapter(this, modelItems);
-        lv.setAdapter(adapter);
 
         // Grab GEOJSON data from API
         RetrieveFeedTask get_geojson = new RetrieveFeedTask();
         get_geojson.execute();
-
         try
         {
             Thread.sleep(2500);
@@ -44,8 +36,9 @@ public class LotList extends Activity{
         }
 
         String geojson = get_geojson.getGson();
+        ParkingLot[] pl_list = new Gson().fromJson(geojson, LotsData.class).features;
 
-        System.out.println(geojson);
-        System.out.println("END OF TESTING");
+        CustomAdapter adapter = new CustomAdapter(this, pl_list);
+        lv.setAdapter(adapter);
     }
 }
