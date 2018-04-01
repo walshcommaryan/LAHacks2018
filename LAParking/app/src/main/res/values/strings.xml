@@ -4,4 +4,5 @@
     <string name="edit_message">Enter the Destination</string>
     <string name="button_send">Find Parking Lots</string>
     <string name="button_lot">Detailed Info</string>
+    <string name="text_dest">From This Location</string>
 </resources>

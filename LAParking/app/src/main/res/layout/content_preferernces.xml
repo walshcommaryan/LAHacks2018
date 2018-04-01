@@ -1,25 +1,40 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menu"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#283593"
     android:orientation="vertical" >
 
     <EditText
         android:id="@+id/editText"
         android:layout_width="276dp"
         android:layout_height="45dp"
+        android:layout_marginTop="80dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#5f5fc4"
+        android:textCursorDrawable="@null"
+        android:textColor="#ffffff"
+        android:textColorHint="#9da1a5"
         android:ems="10"
         android:hint="@string/edit_message"
         android:inputType="textPersonName"
         tools:layout_editor_absoluteX="42dp"
         tools:layout_editor_absoluteY="58dp" />
 
+
     <Button
         android:id="@+id/button_go"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="fill_parent"
+        android:layout_height="400dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#001064"
+        android:textColor="#ffffff"
         android:text="@string/button_send"
+        android:textSize="18sp"
         tools:layout_editor_absoluteX="103dp"
         tools:layout_editor_absoluteY="259dp" />
 
-</LinearLayout>
+</RelativeLayout>

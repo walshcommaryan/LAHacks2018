@@ -8,6 +8,6 @@
         android:id="@+id/lot_btn"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:text="@string/button_lot" />
 </LinearLayout>
