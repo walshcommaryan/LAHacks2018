@@ -1,6 +1,9 @@
 package com.example.ryan.laparking;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +27,7 @@ public class LotList extends Activity{
     private String geocode_api = "https://maps.googleapis.com/maps/api/geocode/json?address=";
     private ParkingLot[] pl_list;
     ListView lv;
+    final Context context = this;
 
     private AddressGeo address_geo;
 
@@ -51,34 +55,53 @@ public class LotList extends Activity{
             String lat_long_json = grabJson(geocode_url);
             address_geo = new Gson().fromJson(lat_long_json, AddressGeo.class);
 
-            if (!address_geo.status.equals("OK"))
+
+            if (lat_long_json == null || !address_geo.status.equals("OK"))
             {
                 // Create a pop up with error message
+                System.out.println(lat_long_json);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(LotList.this);
+                alertDialog.setTitle("Error");
+                alertDialog.setMessage("Invalid address, please try again.");
+                alertDialog.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        finish();
+                    }
+                });
+                AlertDialog alert = alertDialog.create();
+                alert.show();
+            }
+            else{
+
+                // Calculate the distance of parking lots to
+                // user's destination address. And then sort
+                // the ParkingLots pl_list array based on the
+                // distance in ascending order (shortest distance
+                // at the front of the array).
+                setLotsDistance(address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
+
+                Arrays.sort(pl_list, new SortByDistance());
+
+                ParkingLot[] closestLots = Arrays.copyOfRange(pl_list, 0, 25);
+                /*
+                System.out.println("SORTED ARRAY: ");
+                for (int j = 0; j < closestLots.length; j++)
+                {
+                    System.out.print(closestLots[j].properties.formatDistance() + "\n");
+                }
+                */
+
+                CustomAdapter adapter = new CustomAdapter(this, closestLots, address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
+                lv.setAdapter(adapter);
             }
 
-            // Calculate the distance of parking lots to
-            // user's destination address. And then sort
-            // the ParkingLots pl_list array based on the
-            // distance in ascending order (shortest distance
-            // at the front of the array).
-            setLotsDistance(address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
 
-            Arrays.sort(pl_list, new SortByDistance());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-        ParkingLot[] closestLots = Arrays.copyOfRange(pl_list, 0, 25);
-        /*
-        System.out.println("SORTED ARRAY: ");
-        for (int j = 0; j < closestLots.length; j++)
-        {
-            System.out.print(closestLots[j].properties.formatDistance() + "\n");
-        }
-        */
-
-        CustomAdapter adapter = new CustomAdapter(this, closestLots, address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
-        lv.setAdapter(adapter);
     }
 
     private String grabJson(String str_url)
