@@ -19,4 +19,13 @@
         tools:layout_editor_absoluteX="103dp"
         tools:layout_editor_absoluteY="259dp" />
 
+    <Button
+        android:id="@+id/btn_google"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="36dp"
+        android:text="Open in Google Maps" />
+
 </RelativeLayout>

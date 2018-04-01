@@ -15,9 +15,10 @@ import java.util.Arrays;
 public class CustomAdapter extends ArrayAdapter{
     ParkingLot[]modelItems=null;
     Context context;
+    double lat, lng;
     String price;
 
-    public CustomAdapter(Context context, ParkingLot[]resources)
+    public CustomAdapter(Context context, ParkingLot[]resources, double lat, double lng)
     {
         super(context, R.layout.rows, resources);
         this.context=context;
@@ -29,6 +30,8 @@ public class CustomAdapter extends ArrayAdapter{
             System.out.print(this.modelItems[j].properties.formatDistance() + "\n");
         }*/
         this.modelItems=resources;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     @Override
@@ -57,6 +60,14 @@ public class CustomAdapter extends ArrayAdapter{
                 nextScreen.putExtra("Address", modelItems[position].properties.Address);
                 nextScreen.putExtra("Convenient To", modelItems[position].properties.ConvenientTo);
                 nextScreen.putExtra("Total Spaces", modelItems[position].properties.Spaces);
+
+                //Pass lat long dest
+                nextScreen.putExtra("Lat_dest", modelItems[position].properties.Lat);
+                nextScreen.putExtra("Lon_dest", modelItems[position].properties.Lon);
+
+                //Pass lat long src
+                nextScreen.putExtra("Lat_src", lat);
+                nextScreen.putExtra("Lon_src", lng);
 
                 // starting new activity
                 context.startActivity(nextScreen);

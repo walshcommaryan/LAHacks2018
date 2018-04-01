@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -24,6 +25,8 @@ public class LotList extends Activity{
     private ParkingLot[] pl_list;
     ListView lv;
 
+    private AddressGeo address_geo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +36,9 @@ public class LotList extends Activity{
         //Get intent data dest
         Intent i = getIntent();
         String dest = i.getStringExtra("Dest");
-        System.out.println(dest);
+        TextView src_lbl = (TextView) findViewById(R.id.src_lbl);
+        String dest_str = "Searching from " + dest;
+        src_lbl.setText(dest_str);
 
         // Grab GEOJSON data from API
         String geojson = grabJson(LOTS_GJSON);
@@ -44,7 +49,12 @@ public class LotList extends Activity{
             // input destination address.
             String geocode_url = geocode_api + URLEncoder.encode(dest, "UTF-8") + GOOGLE_KEY;
             String lat_long_json = grabJson(geocode_url);
-            AddressGeo address_geo = new Gson().fromJson(lat_long_json, AddressGeo.class);
+            address_geo = new Gson().fromJson(lat_long_json, AddressGeo.class);
+
+            if (!address_geo.status.equals("OK"))
+            {
+                // Create a pop up with error message
+            }
 
             // Calculate the distance of parking lots to
             // user's destination address. And then sort
@@ -67,7 +77,7 @@ public class LotList extends Activity{
         }
         */
 
-        CustomAdapter adapter = new CustomAdapter(this, closestLots);
+        CustomAdapter adapter = new CustomAdapter(this, closestLots, address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
         lv.setAdapter(adapter);
     }
 
