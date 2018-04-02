@@ -39,69 +39,79 @@ public class LotList extends Activity{
 
         //Get intent data dest
         Intent i = getIntent();
-        String dest = i.getStringExtra("Dest");
+
+        boolean using_current_loc = i.getBooleanExtra("UseCurrentLoc", false);
+        double src_lat = 0;
+        double src_lng = 0;
+        String dest_str = "Searching from ";
+        if (using_current_loc)
+        {
+            src_lat = i.getDoubleExtra("CurrentLat", 0);
+            src_lng = i.getDoubleExtra("CurrentLng", 0);
+            dest_str += "Current Location";
+        }
+        else
+        {
+            String dest = i.getStringExtra("Dest");
+            dest_str += dest;
+
+            try {
+                // Get latitude and longitude of the user's
+                // input destination address.
+                String geocode_url = geocode_api + URLEncoder.encode(dest, "UTF-8") + GOOGLE_KEY;
+                String lat_long_json = grabJson(geocode_url);
+                address_geo = new Gson().fromJson(lat_long_json, AddressGeo.class);
+
+                if (lat_long_json == null || !address_geo.status.equals("OK"))
+                {
+                    // Create a pop up with error message
+                    System.out.println(lat_long_json);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(LotList.this);
+                    alertDialog.setTitle("Error");
+                    alertDialog.setMessage("Invalid address, please try again.");
+                    alertDialog.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, close
+                            // current activity
+                            finish();
+                        }
+                    });
+                    AlertDialog alert = alertDialog.create();
+                    alert.show();
+
+                    return;
+                }
+                else
+                {
+                    src_lat = address_geo.results[0].geometry.location.lat;
+                    src_lng = address_geo.results[0].geometry.location.lng;
+                }
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
         TextView src_lbl = (TextView) findViewById(R.id.src_lbl);
-        String dest_str = "Searching from " + dest;
         src_lbl.setText(dest_str);
 
         // Grab GEOJSON data from API
         String geojson = grabJson(LOTS_GJSON);
         pl_list = new Gson().fromJson(geojson, LotsData.class).features;
 
-        try {
-            // Get latitude and longitude of the user's
-            // input destination address.
-            String geocode_url = geocode_api + URLEncoder.encode(dest, "UTF-8") + GOOGLE_KEY;
-            String lat_long_json = grabJson(geocode_url);
-            address_geo = new Gson().fromJson(lat_long_json, AddressGeo.class);
+        // Calculate the distance of parking lots to
+        // user's destination address. And then sort
+        // the ParkingLots pl_list array based on the
+        // distance in ascending order (shortest distance
+        // at the front of the array).
+        setLotsDistance(src_lat, src_lng);
 
+        Arrays.sort(pl_list, new SortByDistance());
 
-            if (lat_long_json == null || !address_geo.status.equals("OK"))
-            {
-                // Create a pop up with error message
-                System.out.println(lat_long_json);
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(LotList.this);
-                alertDialog.setTitle("Error");
-                alertDialog.setMessage("Invalid address, please try again.");
-                alertDialog.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        // if this button is clicked, close
-                        // current activity
-                        finish();
-                    }
-                });
-                AlertDialog alert = alertDialog.create();
-                alert.show();
-            }
-            else{
+        ParkingLot[] closestLots = Arrays.copyOfRange(pl_list, 0, 25);
 
-                // Calculate the distance of parking lots to
-                // user's destination address. And then sort
-                // the ParkingLots pl_list array based on the
-                // distance in ascending order (shortest distance
-                // at the front of the array).
-                setLotsDistance(address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
-
-                Arrays.sort(pl_list, new SortByDistance());
-
-                ParkingLot[] closestLots = Arrays.copyOfRange(pl_list, 0, 25);
-                /*
-                System.out.println("SORTED ARRAY: ");
-                for (int j = 0; j < closestLots.length; j++)
-                {
-                    System.out.print(closestLots[j].properties.formatDistance() + "\n");
-                }
-                */
-
-                CustomAdapter adapter = new CustomAdapter(this, closestLots, address_geo.results[0].geometry.location.lat, address_geo.results[0].geometry.location.lng);
-                lv.setAdapter(adapter);
-            }
-
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
+        CustomAdapter adapter = new CustomAdapter(this, closestLots, src_lat, src_lng);
+        lv.setAdapter(adapter);
     }
 
     private String grabJson(String str_url)

@@ -22,6 +22,17 @@
         tools:layout_editor_absoluteX="42dp"
         tools:layout_editor_absoluteY="58dp" />
 
+    <Button
+        android:id="@+id/btn_currentloc"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="158dp"
+        android:onClick="getCurrentLocation"
+        android:text="Use Current Location" />
 
     <Button
         android:id="@+id/button_go"
